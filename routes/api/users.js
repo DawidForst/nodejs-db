@@ -79,6 +79,7 @@ router.post("/signup", async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
+
 router.post("/login", async (req, res) => {
   try {
     const { error } = userValidationSchema.validate(req.body);
@@ -113,6 +114,7 @@ router.post("/login", async (req, res) => {
       user: {
         email: user.email,
         subscription: user.subscription,
+        avatarURL: user.avatarURL,
       },
     });
   } catch (err) {
