@@ -61,14 +61,14 @@ router.post("/signup", async (req, res) => {
       avatarURL,
     });
 
-    const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
-    });
-    newUser.token = token;
-    await newUser.save();
+    // const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, {
+    //   expiresIn: "1h",
+    // });
+    // newUser.token = token;
+    // await newUser.save();
 
     res.status(201).json({
-      token: newUser.token,
+      // token: newUser.token,
       user: {
         email: newUser.email,
         subscription: newUser.subscription,

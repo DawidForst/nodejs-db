@@ -19,7 +19,10 @@ const authenticateToken = async (req, res, next) => {
       return;
     }
 
-    req.user = user;
+    // req.user = user;
+
+    res.setHeader("Authorization", `Bearer ${token}`);
+
     next();
   } catch (err) {
     res.status(401).json({ message: "Not authorized" });
