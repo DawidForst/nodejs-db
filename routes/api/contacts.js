@@ -9,7 +9,6 @@ const {
   updateContact,
   updateContactFavorite,
 } = require("../../models/contacts.js");
-const authenticateToken = require("../../token.middleware.js");
 
 const contactSchema = Joi.object({
   name: Joi.string().min(2).required(),
@@ -22,8 +21,6 @@ const updateContactSchema = Joi.object({
   email: Joi.string().email(),
   phone: Joi.string().min(7),
 }).or("name", "email", "phone");
-
-router.use(authenticateToken);
 
 router.get("/", async (req, res) => {
   const page = parseInt(req.query.page) || 1;
@@ -96,12 +93,11 @@ router.patch("/:contactId/favorite", async (req, res) => {
     req.params.contactId,
     favorite
   );
-
   if (!updatedContact) {
     res.status(404).json({ message: "Not found" });
   } else {
     res.status(200).json(updatedContact);
   }
-  });
-  
-  module.exports = router;
+});
+
+module.exports = router;
