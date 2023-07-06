@@ -127,6 +127,49 @@ router.post("/logout", authenticateToken, async (req, res) => {
   }
 });
 
+router.get("/current", authenticateToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+      res.status(401).json({ message: "Not authorized" });
+      return;
+    }
+
+    res.status(200).json({
+      email: user.email,
+      subscription: user.subscription,
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+
+router.patch("/", authenticateToken, async (req, res) => {
+  try {
+    const { error } = updateSubscriptionSchema.validate(req.body);
+    if (error) {
+      res.status(400).json({ message: error.message });
+      return;
+    }
+
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      { subscription: req.body.subscription },
+      { new: true }
+    );
+
+    if (!user) {
+      res.status(404).json({ message: "Not found" });
+    } else {
+      res.status(200).json({ subscription: user.subscription });
+    }
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 router.patch("/subscription", authenticateToken, async (req, res) => {
   try {
     const { error } = updateSubscriptionSchema.validate(req.body);
@@ -155,33 +198,39 @@ router.patch("/subscription", authenticateToken, async (req, res) => {
 });
 
 router.patch(
-  "/avatar",
+  "/avatars",
   authenticateToken,
   upload.single("avatar"),
   async (req, res) => {
     try {
-      const user = await User.findById(req.user.id);
-      if (!user) {
-        res.status(404).json({ message: "User not found" });
-        return;
+      if (!req.file) {
+        return res.status(400).json({ message: "File not provided" });
       }
 
-      const { file } = req;
-      const imagePath = path.join(avatarDir, `${user._id}.jpg`);
+      const img = await jimp.read(req.file.path);
+      await img
+        .autocrop()
+        .cover(
+          250,
+          250,
+          jimp.HORIZONTAL_ALIGN_CENTER | jimp.VERTICAL_ALIGN_MIDDLE
+        )
+        .writeAsync(req.file.path);
 
-      const image = await jimp.read(file.path);
-      await image.cover(250, 250).writeAsync(imagePath);
+      const user = await User.findById(req.user._id);
 
-      user.avatarURL = `/avatars/${user._id}.jpg`;
+      if (!user) {
+        return res.status(401).json({ message: "Not authorized" });
+      }
+
+      user.avatarURL = `/avatars/${req.file.filename}`;
       await user.save();
 
-      res.status(200).json({
-        email: user.email,
-        subscription: user.subscription,
-        avatarURL: user.avatarURL,
-      });
+      res.status(200).json({ avatarURL: user.avatarURL });
+
+      await img.writeAsync(path.join(avatarDir, req.file.filename));
     } catch (err) {
-      res.status(500).json({ message: "Internal server error" });
+      res.status(500).json({ message: err.message });
     }
   }
 );
