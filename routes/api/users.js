@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Joi = require("joi");
 const bcrypt = require("bcryptjs");
-const User = require("../../models/user.model");
+const User = require("../../models/user.model.js");
 const authenticateToken = require("../../token.middleware.js");
 const jwt = require("jsonwebtoken");
 const gravatar = require("gravatar");
@@ -139,6 +139,7 @@ router.get("/current", authenticateToken, async (req, res) => {
     res.status(200).json({
       email: user.email,
       subscription: user.subscription,
+      avatarURL: user.avatarURL,
     });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -200,7 +201,7 @@ router.patch("/subscription", authenticateToken, async (req, res) => {
 router.patch(
   "/avatars",
   authenticateToken,
-  upload.single("avatar"),
+  upload.single("avatar"), 
   async (req, res) => {
     try {
       if (!req.file) {
@@ -226,11 +227,9 @@ router.patch(
       user.avatarURL = `/avatars/${req.file.filename}`;
       await user.save();
 
-      res.status(200).json({ avatarURL: user.avatarURL });
-
-      await img.writeAsync(path.join(avatarDir, req.file.filename));
-    } catch (err) {
-      res.status(500).json({ message: err.message });
+      res.status(200).json({ message: "Avatar uploaded successfully" });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
     }
   }
 );
