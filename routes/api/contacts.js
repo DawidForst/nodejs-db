@@ -9,7 +9,6 @@ const {
   updateContact,
   updateContactFavorite,
 } = require("../../models/contacts.js");
-const authenticateToken = require("../../token.middleware.js");
 
 const contactSchema = Joi.object({
   name: Joi.string().min(2).required(),
@@ -90,22 +89,19 @@ router.patch("/:contactId/favorite", async (req, res) => {
     res.status(400).json({ message: "favorite field is missing or invalid" });
     return;
   }
-  const updatedContact = await updateContactFavorite(
-    req.params.contactId,
-    favorite
-  );
-  if (!updatedContact) {
-    res.status(404).json({ message: "Not found" });
-  } else {
-    res.status(200).json(updatedContact);
-  }
-});
-router.get("/", authenticateToken, async (req, res) => {
-  // ...
-});
-
-router.get("/:id", authenticateToken, async (req, res) => {
-  // ...
+  const updateContactFavorite = async (contactId, favorite) => {
+    const contact = await Contact.findByIdAndUpdate(
+      contactId,
+      { favorite },
+      { new: true }
+    );
+  
+    if (!contact) {
+      return null;
+    }
+  
+    return contact;
+  };
 });
 
 module.exports = router;
