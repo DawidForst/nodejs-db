@@ -1,6 +1,7 @@
 const { Schema, model } = require("mongoose");
 const gravatar = require("gravatar");
 
+
 const userSchema = new Schema(
   {
     password: {
@@ -21,6 +22,7 @@ const userSchema = new Schema(
       type: String,
       default: null,
     },
+
     avatarURL: {
       type: String,
       default: function () {
@@ -35,6 +37,7 @@ const userSchema = new Schema(
       type: String,
       required: [true, "Verification token is required"],
     },
+
   },
   { versionKey: false }
 );

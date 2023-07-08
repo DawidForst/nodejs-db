@@ -1,9 +1,13 @@
 const express = require("express");
 const router = express.Router();
+
+const Joi = require("joi");
+
 const bcrypt = require("bcryptjs");
 const User = require("../../models/user.model");
 const authenticateToken = require("../../token.middleware.js");
 const jwt = require("jsonwebtoken");
+
 const gravatar = require("gravatar");
 const jimp = require("jimp");
 const path = require("path");
@@ -19,6 +23,16 @@ const {
 const { upload } = require("./avatar.service");
 
 const avatarDir = path.join(process.cwd(), "public", "avatars");
+
+
+const userValidationSchema = Joi.object({
+  email: Joi.string().email().required(),
+  password: Joi.string().min(6).required(),
+});
+const updateSubscriptionSchema = Joi.object({
+  subscription: Joi.string().valid("starter", "pro", "business").required(),
+});
+
 
 router.post("/signup", async (req, res) => {
   try {
@@ -36,6 +50,7 @@ router.post("/signup", async (req, res) => {
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(req.body.password, salt);
+
 
     const avatarURL = gravatar.url(req.body.email, {
       s: "200",
@@ -67,6 +82,7 @@ router.post("/signup", async (req, res) => {
         email: newUser.email,
         subscription: newUser.subscription,
         avatarURL: newUser.avatarURL,
+
       },
     });
   } catch (err) {
@@ -106,6 +122,7 @@ router.post("/login", async (req, res) => {
       res.status(401).json({ message: "Email not verified" });
       return;
     }
+
     res.status(200).json({
       token: user.token,
       user: {
@@ -174,6 +191,7 @@ router.patch("/", authenticateToken, async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
+
 router.patch(
   "/avatars",
   authenticateToken,
@@ -265,5 +283,6 @@ router.post("/verify", async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
+
 
 module.exports = router;

@@ -10,6 +10,9 @@ const {
   updateContactFavorite,
 } = require("../../models/contacts.js");
 
+const authenticateToken = require("../../token.middleware.js");
+
+
 const contactSchema = Joi.object({
   name: Joi.string().min(2).required(),
   email: Joi.string().email().required(),
@@ -99,5 +102,14 @@ router.patch("/:contactId/favorite", async (req, res) => {
     res.status(200).json(updatedContact);
   }
 });
+
+router.get("/", authenticateToken, async (req, res) => {
+  // ...
+});
+
+router.get("/:id", authenticateToken, async (req, res) => {
+  // ...
+});
+
 
 module.exports = router;

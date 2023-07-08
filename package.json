@@ -9,10 +9,13 @@
     "lint:fix": "eslint --fix **/*.js"
   },
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "cors": "2.8.5",
     "cross-env": "7.0.3",
+
     "express": "^4.18.2",
     "morgan": "1.10.0"
+
   },
   "devDependencies": {
     "eslint": "7.19.0",
@@ -21,6 +24,7 @@
     "eslint-plugin-import": "2.25.3",
     "eslint-plugin-node": "^1.0.0",
     "eslint-plugin-promise": "5.2.0",
+
     "nodemon": "^1.14.9"
   },
   "description": "Виконайте форк цього репозиторію для виконання домашніх завдань (2-6)\r Форк створить репозиторій на вашому http://github.com",
@@ -29,3 +33,4 @@
   "author": "YOUR_NAME <YOUR_EMAIL>",
   "license": "ISC"
 }
+
